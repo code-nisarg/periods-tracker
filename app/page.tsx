@@ -112,7 +112,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                  <Link href="/dashboard">
+                  <Link href="/tracking">
                     <button className="px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-full shadow-lg hover:shadow-2xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center gap-2">
                       Start Tracking Today
                       <ArrowRight className="h-4 w-4" />
