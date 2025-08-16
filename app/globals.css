@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "tailwindcss";
-
 @theme inline {
   --font-sans: var(--font-inter);
   --font-serif: var(--font-playfair);
