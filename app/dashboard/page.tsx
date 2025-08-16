@@ -188,35 +188,77 @@ export default function Dashboard() {
 
           {cycleData && (
             <div className="mb-12 text-center">
-              <h2 className="mb-6 text-3xl font-bold text-gray-900">Your Current Phase</h2>
-              <div className="mx-auto flex max-w-sm items-center justify-center gap-4 rounded-2xl bg-white p-6 shadow-lg border border-gray-100">
-                {cycleData.currentPhase && (
-                  <>
-                    <div className={`rounded-full p-3 ${cycleData.currentPhase.color}`}>
-                      {cycleData.currentPhase.icon && <cycleData.currentPhase.icon className="h-6 w-6" />}
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-semibold text-gray-900">{cycleData.currentPhase.name}</h3>
-                      <p className="text-sm text-gray-600">Day {cycleData.cycleDay} of 28</p>
-                    </div>
-                  </>
-                )}
+              <h2 className="mb-6 text-3xl font-bold text-gray-900">Your Health Today</h2>
+              <div className="mx-auto max-w-2xl">
+                <div className="flex items-center justify-center gap-6 rounded-2xl bg-gradient-to-r from-rose-50 to-purple-50 p-8 shadow-lg border border-pink-100">
+                  {cycleData.currentPhase && (
+                    <>
+                      <div className="flex flex-col items-center">
+                        <div
+                          className={`rounded-full p-4 mb-3 ${
+                            cycleData.currentPhase.name === "Menstrual"
+                              ? "bg-gradient-to-br from-rose-100 to-pink-100"
+                              : cycleData.currentPhase.name === "Follicular"
+                                ? "bg-gradient-to-br from-emerald-100 to-green-100"
+                                : cycleData.currentPhase.name === "Ovulation"
+                                  ? "bg-gradient-to-br from-amber-100 to-yellow-100"
+                                  : "bg-gradient-to-br from-purple-100 to-violet-100"
+                          }`}
+                        >
+                          {cycleData.currentPhase.icon && (
+                            <cycleData.currentPhase.icon
+                              className={`h-8 w-8 ${
+                                cycleData.currentPhase.name === "Menstrual"
+                                  ? "text-rose-600"
+                                  : cycleData.currentPhase.name === "Follicular"
+                                    ? "text-emerald-600"
+                                    : cycleData.currentPhase.name === "Ovulation"
+                                      ? "text-amber-600"
+                                      : "text-purple-600"
+                              }`}
+                            />
+                          )}
+                        </div>
+                        <h3 className="text-2xl font-bold text-gray-900">{cycleData.currentPhase.name} Phase</h3>
+                        <p className="text-sm text-gray-500 font-medium">Day {cycleData.cycleDay}</p>
+                      </div>
+
+                      <div className="flex-1 text-left">
+                        <h4 className="text-lg font-semibold text-gray-800 mb-2">Health Focus</h4>
+                        <p className="text-gray-600 mb-3">{cycleData.currentPhase.description}</p>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Activity className="h-4 w-4 text-purple-500" />
+                          <span className="text-gray-600">
+                            {Object.keys(currentSymptoms).length > 0
+                              ? `${Object.keys(currentSymptoms).length} symptoms tracked today`
+                              : "No symptoms tracked today"}
+                          </span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
-              {cycleData.currentPhase && (
-                <p className="mt-4 text-gray-600 max-w-md mx-auto">{cycleData.currentPhase.description}</p>
-              )}
             </div>
           )}
 
           <Tabs defaultValue="symptoms" className="w-full border-0 outline-0 ring-0">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
-              <TabsTrigger value="symptoms" className="flex items-center gap-2" disabled={!cycleData}>
-                <Activity className="h-4 w-4" />
-                Symptoms
+            <TabsList className="grid w-full max-w-lg mx-auto grid-cols-2 mb-8 h-12">
+              <TabsTrigger
+                value="symptoms"
+                className="flex items-center justify-center gap-2 text-sm font-medium px-4"
+                disabled={!cycleData}
+              >
+                <Activity className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">Symptoms</span>
               </TabsTrigger>
-              <TabsTrigger value="phases" className="flex items-center gap-2" disabled={!cycleData}>
-                <Sparkles className="h-4 w-4" />
-                Phases
+              <TabsTrigger
+                value="phases"
+                className="flex items-center justify-center gap-2 text-sm font-medium px-4"
+                disabled={!cycleData}
+              >
+                <Sparkles className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">Phases</span>
               </TabsTrigger>
             </TabsList>
 

@@ -171,23 +171,90 @@ export default function TrackingPage() {
 
           {cycleData && (
             <div className="mb-12 text-center">
-              <h2 className="mb-6 text-3xl font-bold text-gray-900">Your Current Phase</h2>
-              <div className="mx-auto flex max-w-sm items-center justify-center gap-4 rounded-2xl bg-white p-6 shadow-lg border border-gray-100">
-                {cycleData.currentPhase && (
-                  <>
-                    <div className={`rounded-full p-3 ${cycleData.currentPhase.color}`}>
-                      {cycleData.currentPhase.icon && <cycleData.currentPhase.icon className="h-6 w-6" />}
+              <h2 className="mb-6 text-3xl font-bold text-gray-900">Cycle Progress</h2>
+              <div className="mx-auto max-w-4xl">
+                <div className="grid md:grid-cols-3 gap-6">
+                  {/* Current Phase Card */}
+                  <div className="md:col-span-2 bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                    <div className="flex items-center gap-4 mb-4">
+                      {cycleData.currentPhase && (
+                        <>
+                          <div
+                            className={`rounded-full p-3 ${
+                              cycleData.currentPhase.name === "Menstrual"
+                                ? "bg-gradient-to-br from-rose-100 to-pink-100"
+                                : cycleData.currentPhase.name === "Follicular"
+                                  ? "bg-gradient-to-br from-emerald-100 to-green-100"
+                                  : cycleData.currentPhase.name === "Ovulation"
+                                    ? "bg-gradient-to-br from-amber-100 to-yellow-100"
+                                    : "bg-gradient-to-br from-purple-100 to-violet-100"
+                            }`}
+                          >
+                            {cycleData.currentPhase.icon && (
+                              <cycleData.currentPhase.icon
+                                className={`h-6 w-6 ${
+                                  cycleData.currentPhase.name === "Menstrual"
+                                    ? "text-rose-600"
+                                    : cycleData.currentPhase.name === "Follicular"
+                                      ? "text-emerald-600"
+                                      : cycleData.currentPhase.name === "Ovulation"
+                                        ? "text-amber-600"
+                                        : "text-purple-600"
+                                }`}
+                              />
+                            )}
+                          </div>
+                          <div className="flex-1 text-left">
+                            <h3 className="text-xl font-bold text-gray-900">{cycleData.currentPhase.name}</h3>
+                            <p className="text-sm text-gray-600">
+                              Days {cycleData.currentPhase.days[0]}-
+                              {cycleData.currentPhase.days[cycleData.currentPhase.days.length - 1]}
+                            </p>
+                          </div>
+                        </>
+                      )}
                     </div>
-                    <div>
-                      <h3 className="text-xl font-semibold text-gray-900">{cycleData.currentPhase.name}</h3>
-                      <p className="text-sm text-gray-600">Day {cycleData.cycleDay} of 28</p>
+
+                    {/* Progress Bar */}
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>Cycle Progress</span>
+                        <span>{Math.round((cycleData.cycleDay / 28) * 100)}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-gradient-to-r from-pink-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${(cycleData.cycleDay / 28) * 100}%` }}
+                        ></div>
+                      </div>
                     </div>
-                  </>
-                )}
+
+                    <p className="text-gray-600 text-sm">{cycleData.currentPhase?.description}</p>
+                  </div>
+
+                  {/* Stats Card */}
+                  <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-6 shadow-lg border border-pink-100">
+                    <h4 className="font-semibold text-gray-800 mb-4">Cycle Stats</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Current Day</span>
+                        <span className="font-semibold text-gray-800">{cycleData.cycleDay}/28</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Phase</span>
+                        <span className="font-semibold text-gray-800">{cycleData.currentPhase?.name}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Next Period</span>
+                        <span className="font-semibold text-gray-800">
+                          {Math.ceil((cycleData.nextPeriod.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))}{" "}
+                          days
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              {cycleData.currentPhase && (
-                <p className="mt-4 text-gray-600 max-w-md mx-auto">{cycleData.currentPhase.description}</p>
-              )}
             </div>
           )}
 

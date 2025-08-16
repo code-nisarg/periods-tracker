@@ -1,8 +1,7 @@
 "use client"
 
-import { useEffect } from "react"
-import { Heart, Flower2, Sparkles, ArrowRight, TrendingUp } from "lucide-react"
-import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts"
+import { useEffect, useState } from "react"
+import { Heart, Flower2, Sparkles, ArrowRight, Calendar, Clock } from "lucide-react"
 import Link from "next/link"
 
 // Sample cycle data for demonstration
@@ -22,7 +21,34 @@ const cycleData = [
 ]
 
 export default function HomePage() {
+  const [lastPeriodDate, setLastPeriodDate] = useState<string | null>(null)
+  const [daysUntilNext, setDaysUntilNext] = useState<number>(0)
+  const [currentPhase, setCurrentPhase] = useState<string>("Unknown")
+
   useEffect(() => {
+    const storedDate = localStorage.getItem("lastPeriodDate")
+    if (storedDate) {
+      setLastPeriodDate(storedDate)
+      const lastDate = new Date(storedDate)
+      const today = new Date()
+      const daysSinceLast = Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24))
+      const cycleLength = 28 // Average cycle length
+      const daysUntil = cycleLength - daysSinceLast
+
+      setDaysUntilNext(daysUntil > 0 ? daysUntil : 0)
+
+      // Determine current phase
+      if (daysSinceLast <= 5) {
+        setCurrentPhase("Menstrual")
+      } else if (daysSinceLast <= 13) {
+        setCurrentPhase("Follicular")
+      } else if (daysSinceLast <= 16) {
+        setCurrentPhase("Ovulation")
+      } else {
+        setCurrentPhase("Luteal")
+      }
+    }
+
     const initLenis = async () => {
       const Lenis = (await import("@studio-freight/lenis")).default
       const lenis = new Lenis({
@@ -144,110 +170,82 @@ export default function HomePage() {
               <div className="relative lg:h-[600px] flex items-center justify-center">
                 <div className="relative w-full max-w-lg">
                   {/* Interactive cycle tracking chart */}
-                  <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-pink-100">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 lg:p-8 shadow-2xl border border-pink-100">
                     <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-xl font-bold text-gray-800">Cycle Analytics</h3>
+                      <h3 className="text-lg lg:text-xl font-bold text-gray-800">Your Cycle Status</h3>
                       <div className="flex items-center gap-1 text-sm text-gray-600">
-                        <TrendingUp className="h-4 w-4 text-pink-500" />
-                        Live Preview
+                        <Calendar className="h-4 w-4 text-pink-500" />
+                        <span className="hidden sm:inline">Live Tracking</span>
                       </div>
                     </div>
 
-                    {/* Interactive chart */}
-                    <div className="h-64 mb-6">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={cycleData}>
-                          <defs>
-                            <linearGradient id="energyGradient" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#ec4899" stopOpacity={0.3} />
-                              <stop offset="95%" stopColor="#ec4899" stopOpacity={0.1} />
-                            </linearGradient>
-                            <linearGradient id="moodGradient" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
-                              <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1} />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                          <XAxis
-                            dataKey="day"
-                            axisLine={false}
-                            tickLine={false}
-                            tick={{ fontSize: 12, fill: "#64748b" }}
-                          />
-                          <YAxis
-                            domain={[0, 10]}
-                            axisLine={false}
-                            tickLine={false}
-                            tick={{ fontSize: 12, fill: "#64748b" }}
-                          />
-                          <Tooltip
-                            contentStyle={{
-                              backgroundColor: "white",
-                              border: "1px solid #f1f5f9",
-                              borderRadius: "12px",
-                              boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-                            }}
-                            labelStyle={{ color: "#374151", fontWeight: "bold" }}
-                          />
-                          <Area
-                            type="monotone"
-                            dataKey="energy"
-                            stroke="#ec4899"
-                            strokeWidth={2}
-                            fill="url(#energyGradient)"
-                            name="Energy Level"
-                          />
-                          <Area
-                            type="monotone"
-                            dataKey="mood"
-                            stroke="#8b5cf6"
-                            strokeWidth={2}
-                            fill="url(#moodGradient)"
-                            name="Mood"
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    </div>
-
-                    {/* Chart legend and insights */}
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 bg-pink-500 rounded-full"></div>
-                          <span className="text-gray-600">Energy Level</span>
+                    {lastPeriodDate ? (
+                      <div className="space-y-6">
+                        {/* Period countdown */}
+                        <div className="text-center p-6 bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl border border-pink-100">
+                          <div className="flex items-center justify-center gap-2 mb-2">
+                            <Clock className="h-5 w-5 text-pink-500" />
+                            <span className="text-sm font-medium text-gray-600">Next Period In</span>
+                          </div>
+                          <div className="text-4xl lg:text-5xl font-bold text-gray-900 mb-1">{daysUntilNext}</div>
+                          <div className="text-sm text-gray-600">{daysUntilNext === 1 ? "day" : "days"}</div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                          <span className="text-gray-600">Mood</span>
+
+                        {/* Current phase */}
+                        <div className="text-center p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                          <div className="text-sm font-medium text-gray-600 mb-1">Current Phase</div>
+                          <div className="text-2xl font-bold text-gray-900 mb-2">{currentPhase}</div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                              className="bg-gradient-to-r from-pink-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+                              style={{
+                                width:
+                                  currentPhase === "Menstrual"
+                                    ? "25%"
+                                    : currentPhase === "Follicular"
+                                      ? "50%"
+                                      : currentPhase === "Ovulation"
+                                        ? "75%"
+                                        : "100%",
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+
+                        {/* Quick actions */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <Link href="/dashboard" className="block">
+                            <button className="w-full p-3 bg-pink-500 text-white font-medium rounded-xl hover:bg-pink-600 transition-colors duration-200 text-sm">
+                              Log Symptoms
+                            </button>
+                          </Link>
+                          <Link href="/tracking" className="block">
+                            <button className="w-full p-3 bg-purple-500 text-white font-medium rounded-xl hover:bg-purple-600 transition-colors duration-200 text-sm">
+                              View Calendar
+                            </button>
+                          </Link>
                         </div>
                       </div>
-
-                      {/* Phase indicators */}
-                      <div className="grid grid-cols-2 gap-3 text-xs">
-                        <div className="flex items-center gap-2 p-2 bg-red-50 rounded-lg">
-                          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                          <span className="text-gray-700">Menstrual (1-5)</span>
-                        </div>
-                        <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg">
-                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                          <span className="text-gray-700">Follicular (6-13)</span>
-                        </div>
-                        <div className="flex items-center gap-2 p-2 bg-yellow-50 rounded-lg">
-                          <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                          <span className="text-gray-700">Ovulation (14-16)</span>
-                        </div>
-                        <div className="flex items-center gap-2 p-2 bg-purple-50 rounded-lg">
-                          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                          <span className="text-gray-700">Luteal (17-28)</span>
-                        </div>
-                      </div>
-
-                      {/* Key insight */}
-                      <div className="bg-gradient-to-r from-pink-50 to-purple-50 p-3 rounded-lg border border-pink-100">
-                        <p className="text-sm text-gray-700 font-medium">
-                          Peak energy and mood typically occur during ovulation phase
+                    ) : (
+                      <div className="text-center py-8">
+                        <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                        <h4 className="text-lg font-semibold text-gray-700 mb-2">Start Your Journey</h4>
+                        <p className="text-gray-600 mb-6 text-sm">
+                          Track your first period to get personalized insights and predictions.
                         </p>
+                        <Link href="/tracking">
+                          <button className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
+                            Get Started
+                          </button>
+                        </Link>
                       </div>
+                    )}
+
+                    {/* Health tip */}
+                    <div className="mt-6 bg-gradient-to-r from-pink-50 to-purple-50 p-4 rounded-xl border border-pink-100">
+                      <p className="text-xs sm:text-sm text-gray-700 font-medium text-center">
+                        💡 Stay hydrated and listen to your body during each phase
+                      </p>
                     </div>
                   </div>
                 </div>
